@@ -6,7 +6,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Timer />
+        <Timer start={Date.now()}/>
       </div>
     );
   }
