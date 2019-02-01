@@ -98,6 +98,27 @@ class Auth extends Component {
         });
     }
 
+    handleRegisterWithGoogle = event => {
+        event.preventDefault();
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithPopup(provider)
+            .then(result => {
+                console.log(result)
+                const user = result.user;
+                firebase.database().ref(`users/${user.uid}`).set({
+                    email: user.email,
+                    name: user.displayName
+                })
+            })
+            .catch(e => {
+                const error = e.message;
+                this.setState({
+                    error
+                });
+            })
+
+    }
+
 
     render() {
         return (
@@ -110,7 +131,8 @@ class Auth extends Component {
                 <input type="password" ref={element => this.passwordInput = element} /><br />
                     <button id="login" onClick={this.handleLogin}>Login</button>
                     <button id="logout" className="hide" onClick={this.handleLogout}>Logout</button>
-                    <button id="register" onClick={this.handleRegister}>Register</button>
+                    <button id="register" onClick={this.handleRegister}>Register</button><br />
+                    <button id="google" className="google" onClick={this.handleRegisterWithGoogle}>Sign in With Google</button>
             </form>
         </div>
         )
