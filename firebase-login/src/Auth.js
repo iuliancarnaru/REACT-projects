@@ -22,23 +22,37 @@ class Auth extends Component {
         error:'',
         message: ''
     }
-      
-    handleSubmit = event => {
-        // e.preventDefault();
-        // this.setState({ 
-        //     email: this.emailInput.value,
-        //     password: this.passwordInput.value
-        // });
-    };
+
+    clearInput = () => {
+        this.emailInput.value = '';
+        this.passwordInput.value = '';
+    }
+
     
     handleLogin = event => {
         event.preventDefault();
         const email = this.emailInput.value;
         const password = this.passwordInput.value;
 
-        const auth = firebase.auth();
+        const auth = firebase.auth(); //returns a promise
         auth.signInWithEmailAndPassword(email, password)
-            .then()
+            .then( user => {
+                const logout = document.getElementById('logout');
+                logout.classList.remove('hide');
+                const register = document.getElementById('register');
+                register.classList.add('hide');
+                const login = document.getElementById('login');
+                login.classList.add('hide');
+
+
+                const message = `Welcome back ${email}`;
+                this.setState({
+                    message,
+                    error: ''
+                })
+
+                this.clearInput();
+            })
             .catch( e => {
                 const error = e.message;
                 this.setState({
@@ -55,8 +69,8 @@ class Auth extends Component {
         const auth = firebase.auth();
         auth.createUserWithEmailAndPassword(email, password)
             .then(user => {
-                console.log(user);
-                const message = `Welcome ${email}`;
+
+                const message = `Thank you for registering with us ${email}`;
                 firebase.database().ref(`users/${user.user.uid}`).set({
                     email
                 })
@@ -74,7 +88,15 @@ class Auth extends Component {
             })
     }
 
-    
+    handleLogout = event => {
+        firebase.auth().signOut();
+        const logout = document.getElementById('logout');
+        logout.classList.add('hide');
+        const message = `See you soon... Have a nice day!`;
+        this.setState({
+            message
+        });
+    }
 
 
     render() {
@@ -86,9 +108,9 @@ class Auth extends Component {
             <form onSubmit={this.handleSubmit}>
                 <input type="email" ref={element => this.emailInput = element} /><br />
                 <input type="password" ref={element => this.passwordInput = element} /><br />
-                    <button onClick={this.handleLogin}>Login</button>
-                    <button onClick={this.handleLogout}>Logout</button>
-                    <button onClick={this.handleRegister}>Register</button>
+                    <button id="login" onClick={this.handleLogin}>Login</button>
+                    <button id="logout" className="hide" onClick={this.handleLogout}>Logout</button>
+                    <button id="register" onClick={this.handleRegister}>Register</button>
             </form>
         </div>
         )
