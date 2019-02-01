@@ -17,6 +17,8 @@ const config = {
 
 firebase.initializeApp(config);
 
+
+
 class Survey extends Component {
     nameSubmit(event){
         var studentName = this.refs.name.value;

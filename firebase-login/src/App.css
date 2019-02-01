@@ -40,6 +40,10 @@ background: linear-gradient(to left, #24C6DC , #514A9D); /* W3C, IE 10+/ Edge, F
 
 }
 
+h1 {
+  color: white;
+}
+
 
 
 
@@ -79,8 +83,11 @@ button {
 }
 
 p{
-  color: orange;
-  text-decoration: underline;
+  color: #fff;
+  background-color: rgb(155, 55, 55);
+  display: inline-block;
+  padding: 10px;
+  border-radius: 5px;
 }
 
 .hide{

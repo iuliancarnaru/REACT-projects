@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-
-const firebase = require('firebase/app');
-require("firebase/database");
-
+import firebase from 'firebase/app';
+import 'firebase/database';
+import 'firebase/auth';
 
 const config = {
     apiKey: process.env.REACT_APP_API_KEY,
@@ -19,7 +18,9 @@ firebase.initializeApp(config);
 class Auth extends Component {
     state = {
         email: '',
-        password: ''
+        password: '',
+        error:'',
+        message: ''
     }
       
     handleSubmit = event => {
@@ -31,23 +32,63 @@ class Auth extends Component {
     };
     
     handleLogin = event => {
+        event.preventDefault();
         const email = this.emailInput.value;
         const password = this.passwordInput.value;
-        console.log(email, password);
+
+        const auth = firebase.auth();
+        auth.signInWithEmailAndPassword(email, password)
+            .then()
+            .catch( e => {
+                const error = e.message;
+                this.setState({
+                    error
+                });
+        })
     }
+
+    handleRegister = event => {
+        event.preventDefault();
+        const email = this.emailInput.value;
+        const password = this.passwordInput.value;
+
+        const auth = firebase.auth();
+        auth.createUserWithEmailAndPassword(email, password)
+            .then(user => {
+                console.log(user);
+                const message = `Welcome ${email}`;
+                firebase.database().ref(`users/${user.user.uid}`).set({
+                    email
+                })
+                this.setState({
+                    error: '',
+                    message
+                })
+
+            })
+            .catch(e => {
+                const error = e.message;
+                this.setState({
+                    error
+                });
+            })
+    }
+
+    
 
 
     render() {
         return (
         <div>
             <h1>Welcome to our page!</h1>
-
+            <p className={this.state.error ? 'p' : 'hide'}>{this.state.error}</p>
+            <p className={this.state.message ? 'p' : 'hide'}>{this.state.message}</p>
             <form onSubmit={this.handleSubmit}>
                 <input type="email" ref={element => this.emailInput = element} /><br />
                 <input type="password" ref={element => this.passwordInput = element} /><br />
-                <button onClick={this.handleLogin}>Login</button>
-                <button onClick={this.handleLogout}>Logout</button>
-                <button onClick={this.handleRegister}>Register</button>
+                    <button onClick={this.handleLogin}>Login</button>
+                    <button onClick={this.handleLogout}>Logout</button>
+                    <button onClick={this.handleRegister}>Register</button>
             </form>
         </div>
         )
