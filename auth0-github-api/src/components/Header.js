@@ -3,14 +3,21 @@ import { Navbar, Button } from 'react-bootstrap';
 
 class Header extends Component {
   render() {
-    return (
-        <div>
-            <Navbar bg="light">
-                <Navbar.Brand href="#home">GitHub searcher</Navbar.Brand>
-                <Button onClick={this.props.handleLogin} variant="outline-success">Login</Button>
-            </Navbar>
-        </div>
-    )
+      let button;
+
+      if(this.props.accessToken) {
+        button = <Button onClick={this.props.handleLogout} variant="outline-success">Logout</Button>
+      } else {
+        button = <Button onClick={this.props.handleLogin} variant="outline-success">Login</Button>
+      }
+        return (
+            <div>
+                <Navbar bg="light">
+                    <Navbar.Brand href="#home">GitHub searcher</Navbar.Brand>
+                    { button }
+                </Navbar>
+            </div>
+        )
   }
 }
 

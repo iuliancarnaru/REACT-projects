@@ -11,7 +11,12 @@ import Header from './components/Header';
 
 class App extends Component {
 
-  componentDidMount() {
+  state = {
+    accessToken: '',
+    profile:''
+  }
+
+  componentWillMount() {
     this.lock = new Auth0Lock('UFGgxImj4heaE9oumR7qz9xtv1W2ajv1','iuliancarnaru.eu.auth0.com');
     this.lock.on('authenticated', (authResult) => {
       this.lock.getUserInfo(authResult.accessToken, function(error, profile) {
@@ -20,24 +25,60 @@ class App extends Component {
           return;
         }
 
-        document.getElementById('nick').textContent = profile.nickname;
-
         localStorage.setItem('accessToken', authResult.accessToken);
         localStorage.setItem('profile', JSON.stringify(profile));
+
       });
-    })
+
+    });
+
+    this.getProfile();
+  }
+
+  getProfile = () => {
+    if(localStorage.getItem('accessToken') !== null) {
+      this.setState({
+        accessToken: localStorage.getItem('accessToken'),
+        profile: JSON.parse(localStorage.getItem('profile'))
+      })
+    }
   }
 
   handleLogin = () => {
     this.lock.show();
   }
+
+  handleLogout = () => {
+    this.setState({
+      accessToken: '',
+      profile: ''
+    }, () => {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('profile')
+    })
+
+
+  }
   
   render() {
+
+    let gitty;
+
+    if(this.state.accessToken) {
+      gitty = <Github profile={this.state.profile}/>
+    } else {
+      gitty = "Click on login to view Github viewer"
+    }
+    
     return (
       <div className="App">
-        <Header handleLogin={this.handleLogin}/>
-        <h2>Welcome <span id="nick" className="nickname"></span></h2>
-        <Github />
+        <Header 
+            lock={this.lock}
+            accessToken={this.state.accessToken}
+            handleLogin={this.handleLogin} 
+            handleLogout={this.handleLogout}
+        />
+        {gitty}
       </div>
     );
   }
